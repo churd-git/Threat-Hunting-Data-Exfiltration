@@ -1,5 +1,4 @@
-                  ![Ransomware-data-exfiltration-detection-and-mitigation-strategies-568x319](https://github.com/user-attachments/assets/01c6aa0a-4f44-46b4-837b-16769e1c7b5c)
-
+![Untitled design](https://github.com/user-attachments/assets/7ab49239-feaa-4986-b4f1-90f313fb911d)
 # Threat Hunt Report: Data Exfiltration (T1027.003) 
 
 ## Example Scenario:
