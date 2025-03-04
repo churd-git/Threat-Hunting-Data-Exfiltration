@@ -1,5 +1,5 @@
 
-# Threat Hunt Report: Data Exfiltration 
+# Threat Hunt Report: Data Exfiltration (T1027.003) 
 
 ## Example Scenario:
 
@@ -16,7 +16,12 @@ Known Information:
 ---
 
 ## High-Level Command and Scripting Interpreter: PowerShell related IoC Discovery Plan:
-1.
+1. Check DeviceFileEvents for any suspicious file activity involving the "corp-ny-it-0334" workstation or "bmontgomery" user account.
+2. Check DeviceFileEvents for activity involving the downloaded company files.
+3. Search DeviceEvents for activity involving the newly renamed files.
+4. Check DeviceEvents for interactions with the newly created steg files.
+5. Check DeviceFileEvents for any follow up interaction with the encrypted zip file that was created by a user on the lobby computer.
+6. Search DeviceFileEvents to see who/if anyone accesses the zip file that was out into the F: Drive.    
 
 ---
 
@@ -53,11 +58,38 @@ DeviceEvents
 <img width="1468" alt="Screenshot 2025-03-04 at 6 31 18 AM" src="https://github.com/user-attachments/assets/775e0117-c7db-4667-8a06-97c33676de81" />
 <img width="1467" alt="Screenshot 2025-03-04 at 6 38 49 AM" src="https://github.com/user-attachments/assets/3fd28cc8-fe33-419c-b679-bf0efd131baf" />
 
-4. 
+4. Investigated DeviceEvents for activity with files ending in .bmp. At "2025-02-05T06:34:44.0874954Z" the following command was used in order to create a zip archive with the newly created steg files ""7z.exe"  a -tzip bryce-and-kid.bmp bryce-fishing.bmp suzie-and-bob.bmp -p bryce -mem=AES256". Shortly after this command was used to encrypt and password protect the files "7z  a -tzip -p******" -mem=AES256 secure_files.zip bryce-and-kid.bmp bryce-fishing.bmp suzie-and-bob.bmp". These actions were initiated again on the "lobby-fl2-ae5fc" device and by the user "lobbyuser". The output of the ecypted zip files was called "secure_files.zip".
 
 ```kql
-
+DeviceEvents
+| where DeviceName contains "lobby-fl2-ae5fc"
+| where Timestamp >= datetime(2025-02-05T06:18:59.0882396Z)
+| where InitiatingProcessCommandLine contains ".bmp"
+| where InitiatingProcessFileName contains "7z.exe"
+| project Timestamp, DeviceName, InitiatingProcessFileName, InitiatingProcessCommandLine, InitiatingProcessAccountName
 ```
+![Screenshot 2025-03-04 at 4 38 05 PM](https://github.com/user-attachments/assets/432852eb-05c7-45fa-9a15-0caaf8cd68a3)
+
+5. Searched the DeviceFileEvent logs to identify if futher action was taken on the newly created zip file "secure_files.zip". At "2025-02-05T06:46:19.3571553Z" the file was renamed to "marketing_misc.zip" by the lobbyuser and placed into the F: Drive.
+
+```kql
+DeviceFileEvents
+| where DeviceName contains "lobby-fl2-ae5fc"
+| where Timestamp >= datetime(2025-02-05T06:35:58.6268017Z)
+| where PreviousFileName contains "secure"
+```
+![Screenshot 2025-03-04 at 4 59 15 PM](https://github.com/user-attachments/assets/2ac110ee-51c1-4e71-956c-da6e532d445d)
+
+6. Investigated the DeviceFileEvents to identify if "bmontgomery" or "corp-ny-it-0334" interacted with the "marketing_misc.zip" in the F: Drive. The file was taken from the F: Drive at "2025-02-05T08:57:32.2582822Z" by "bmontgomery" and caved to corp-ny-it-0334". Based on the evidence it appears Bryce used elevated privileges to access and download sensitive company files. In order to avoid suspicioun and hide his actions, Bryce moved the files to the F: Drive where he could access those files, rename them, obfuscate them, and compress and encrypt them all on a public (for the company) device. After performing his nefarious activities he then returned the final zip file with the stolen files to his own computer where it appears he had planned to exfiltrate it. No evidence suggest he was successful however. Based on the evidence he has not yet exfiltrated the data and thier is time to stop him before he causes any more harm.
+
+```kql
+DeviceFileEvents
+| where DeviceName contains "corp-ny-it-0334"
+| where InitiatingProcessAccountName contains "bmontgomery"
+| where FileName contains "marketing"
+```
+![Screenshot 2025-03-04 at 5 30 09 PM](https://github.com/user-attachments/assets/b0d860f9-5011-4dbc-9f86-553a2636dbf7)
+
 ---
 
 ## Chronological Events
