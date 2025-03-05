@@ -16,6 +16,7 @@ Known Information:
 ---
 
 ## High-Level Command and Scripting Interpreter: PowerShell related IoC Discovery Plan:
+
 1. Check DeviceFileEvents for any suspicious file activity involving the "corp-ny-it-0334" workstation or "bmontgomery" user account.
 2. Check DeviceFileEvents for activity involving the downloaded company files.
 3. Search DeviceEvents for activity involving the newly renamed files.
@@ -93,18 +94,78 @@ DeviceFileEvents
 ---
 
 ## Chronological Events
+1. **Initial File Download and Movement**  
+   **Timestamp:** 2025-02-05T05:45:12.1857689Z  
+   **Device:** corp-ny-it-0334  
+   **User:** bmontgomery  
+   **Activity:**  
+   The employee (bmontgomery) downloaded three sensitive research files:  
+   - Q1-2025-ResearchAndDevelopment.pdf  
+   - Q2-2025-HumanTrials.pdf  
+   - Q3-2025-AnimalTrials-SiberianTigers.pdf  
+   Immediately after downloading, these files were moved to the F: drive—a company-wide shared folder—potentially exposing them to any device with access to this drive.
 
+2. **Access and Renaming on the Lobby Computer**  
+   **Timestamp:** Between 2025-02-05T06:08:17.8607376Z and 2025-02-05T06:09:35.6273078Z  
+   **Device:** lobby-fl2-ae5fc  
+   **User:** lobbyuser  
+   **Activity:**  
+   The three sensitive research files were accessed on the F: drive.  
+   The files were then renamed to:  
+   - bryce-homework-fall-2024.pdf  
+   - Amazon-Order-123456789-Invoice.pdf  
+   - temp___2bbf98cf.pdf  
+   **Note:** This renaming appears intended to obscure the files’ true nature and avoid immediate detection.  
+   **Additional Event on Lobby Device:**  
+   **Timestamp:** 2025-02-05T06:18:59.0882396Z  
+   **Activity:** The program steghide.exe was downloaded. This software is known for its use in concealing data within image files, a common obfuscation technique.
+
+3. **Data Obfuscation Using Steghide**  
+   **Timestamp:** 2025-02-05T06:22:37.6603913Z  
+   **Device:** lobby-fl2-ae5fc  
+   **Activity:**  
+   The steghide tool was executed to embed:  
+   - The file bryce-homework-fall-2024.pdf into bryce-and-kid.bmp.  
+   - The file Amazon-Order-123456789-Invoice.pdf into bryce-fishing.bmp.  
+   **Cleanup Action:**  
+   **Timestamp:** 2025-02-05T06:36:53.0523679Z  
+   The steghide software was deleted from the device in an attempt to remove evidence of its use.
+
+4. **Creation and Encryption of Zip Archive**  
+   **Timestamp:** 2025-02-05T06:34:44.0874954Z  
+   **Device:** lobby-fl2-ae5fc  
+   **Activity:**  
+   A command using 7z.exe was executed to create a zip archive containing the newly created BMP files (which now concealed the original sensitive documents).  
+   The archive was subsequently encrypted and password-protected (using AES256 encryption) to produce an encrypted file named secure_files.zip.
+
+5. **Renaming and Relocation of the Encrypted Archive**  
+   **Timestamp:** 2025-02-05T06:46:19.3571553Z  
+   **Device:** lobby-fl2-ae5fc  
+   **User:** lobbyuser  
+   **Activity:**  
+   The encrypted file secure_files.zip was renamed to marketing_misc.zip.  
+   The renamed file was then placed back into the F: drive.
+
+6. **Retrieval of the Final Package by the Malicious Actor**  
+   **Timestamp:** 2025-02-05T08:57:32.2582822Z  
+   **Device:** corp-ny-it-0334  
+   **User:** bmontgomery  
+   **Activity:**  
+   The file marketing_misc.zip was taken from the F: drive and copied to the corporate device.  
+   This indicates that after performing the obfuscation and packaging on the lobby computer, bmontgomery retrieved the final package—presumably with the intent to exfiltrate the sensitive data.
 
 ---
 
 ## Summary
 
+An employee, bmontgomery, misused elevated privileges on device corp-ny-it-0334 by initially downloading three highly sensitive research files that were not required for his role. To conceal his actions, he transferred these files to a shared F: drive. Soon after, on a public lobby computer (lobby-fl2-ae5fc) under the account lobbyuser, the files were accessed and deceptively renamed. The attacker then downloaded and used steghide.exe to embed the files into BMP images, further obfuscating the data. To add another layer of protection against detection, these modified files were archived and encrypted with 7z.exe, with the resulting zip file being renamed before it was placed back onto the F: drive. Finally, bmontgomery later retrieved this package from the F: drive to his corporate device—indicating his intent to exfiltrate the data, although no evidence shows that the data was successfully exfiltrated.
 
+This timeline shows a clear, methodical process where the attacker took multiple steps—from initial download and file transfer to obfuscation, encryption, and eventual retrieval—in an attempt to stealthily extract sensitive company information.
 
 ---
 
 ## Response Taken
-
+The employee's access and account were blocked. Both the devices involved in this incident were quarantined in order to do a deep analysis. The evidence acquired during this investigation was handed over to HR to take appropriate actions. Afterwards a more thorough investigation was launched in order to identify lessons learned to avoid this incident in future scenarios. The resulting recommendations made based on the incident were more strict role based access controls, the blacklisting of software such as steghide and other similar software, and alerts set up when the use of 7zip and other data compressing files are used on company devices.  
 
 ---
 
