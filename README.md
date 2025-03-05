@@ -134,25 +134,19 @@ DeviceFileEvents
 4. **Creation and Encryption of Zip Archive**  
    **Timestamp:** 2025-02-05T06:34:44.0874954Z  
    **Device:** lobby-fl2-ae5fc  
-   **Activity:**  
-   A command using 7z.exe was executed to create a zip archive containing the newly created BMP files (which now concealed the original sensitive documents).  
-   The archive was subsequently encrypted and password-protected (using AES256 encryption) to produce an encrypted file named secure_files.zip.
+   **Activity:** A command using 7z.exe was executed to create a zip archive containing the newly created BMP files (which now concealed the original sensitive documents). The archive was subsequently encrypted and password-protected (using AES256 encryption) to produce an encrypted file named secure_files.zip.
 
 5. **Renaming and Relocation of the Encrypted Archive**  
    **Timestamp:** 2025-02-05T06:46:19.3571553Z  
    **Device:** lobby-fl2-ae5fc  
    **User:** lobbyuser  
-   **Activity:**  
-   The encrypted file secure_files.zip was renamed to marketing_misc.zip.  
-   The renamed file was then placed back into the F: drive.
+   **Activity:** The encrypted file secure_files.zip was renamed to marketing_misc.zip. The renamed file was then placed back into the F: drive.
 
 6. **Retrieval of the Final Package by the Malicious Actor**  
    **Timestamp:** 2025-02-05T08:57:32.2582822Z  
    **Device:** corp-ny-it-0334  
    **User:** bmontgomery  
-   **Activity:**  
-   The file marketing_misc.zip was taken from the F: drive and copied to the corporate device.  
-   This indicates that after performing the obfuscation and packaging on the lobby computer, bmontgomery retrieved the final package—presumably with the intent to exfiltrate the sensitive data.
+   **Activity:** The file marketing_misc.zip was taken from the F: drive and copied to the corporate device. This indicates that after performing the obfuscation and packaging on the lobby computer, bmontgomery retrieved the final package—presumably     with the intent to exfiltrate the sensitive data.
 
 ---
 
